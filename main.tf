@@ -7,6 +7,7 @@ variable "subnet-cidr-block" {}
 variable "availability_zone" {}
 variable "env_prefix" {}
 variable "ip-address" {}
+variable "instance-type" {}
 
 resource "aws_vpc" "myapp-vpc" {
     cidr_block = var.vpc-cidr-block
@@ -70,5 +71,37 @@ resource "aws_security_group" "myapp-security-group" {
 
   tags = {
     Name = "${var.env_prefix}-security-group"
+  }
+}
+
+data "aws_ami" "latest-amazon-linux-image" {
+  most_recent = true
+  owners = ["amazon"]
+  filter {
+    name = "name"
+    values = ["amzn2-ami-hvm-*-x86_64-gp2"]
+  }
+  filter {
+    name = "virtualization-type"
+    values = ["hvm"]
+  }
+}
+
+output "aws-ami-id" {
+  value = data.aws_ami.latest-amazon-linux-image.id
+}
+
+resource "aws_instance" "myapp-server" {
+  ami = data.aws_ami.latest-amazon-linux-image.id
+  instance_type = var.instance-type
+
+  subnet_id = aws_subnet.myapp-subnet-1.id
+  vpc_security_group_ids = [aws_security_group.myapp-security-group.id]
+  availability_zone = var.availability_zone
+  associate_public_ip_address = true
+  key_name = "server-key-pair"
+
+  tags = {
+    Name = "${var.env_prefix}-EC-2-server"
   }
 }
