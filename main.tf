@@ -8,6 +8,7 @@ variable "availability_zone" {}
 variable "env_prefix" {}
 variable "ip-address" {}
 variable "instance-type" {}
+variable "public-key-path" {}
 
 resource "aws_vpc" "myapp-vpc" {
     cidr_block = var.vpc-cidr-block
@@ -91,6 +92,15 @@ output "aws-ami-id" {
   value = data.aws_ami.latest-amazon-linux-image.id
 }
 
+output "ec-2-public-ip" {
+  value = aws_instance.myapp-server.public_ip
+}
+
+resource "aws_key_pair" "ssh-key" {
+  key_name = "server-key"
+  public_key = file(var.public-key-path)
+}
+
 resource "aws_instance" "myapp-server" {
   ami = data.aws_ami.latest-amazon-linux-image.id
   instance_type = var.instance-type
@@ -99,8 +109,8 @@ resource "aws_instance" "myapp-server" {
   vpc_security_group_ids = [aws_security_group.myapp-security-group.id]
   availability_zone = var.availability_zone
   associate_public_ip_address = true
-  key_name = "server-key-pair"
-
+  key_name = aws_key_pair.ssh-key.key_name
+ 
   tags = {
     Name = "${var.env_prefix}-EC-2-server"
   }
