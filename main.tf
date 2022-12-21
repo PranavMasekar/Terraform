@@ -9,6 +9,7 @@ variable "env_prefix" {}
 variable "ip-address" {}
 variable "instance-type" {}
 variable "public-key-path" {}
+variable "private-key-path" {}
 
 resource "aws_vpc" "myapp-vpc" {
     cidr_block = var.vpc-cidr-block
