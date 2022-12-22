@@ -6,3 +6,4 @@ variable "ip-address" {}
 variable "instance-type" {}
 variable "public-key-path" {}
 variable "private-key-path" {}
+variable "image_name" {}
