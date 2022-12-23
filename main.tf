@@ -1,3 +1,13 @@
+terraform {
+  required_version = ">=0.12"
+  backend "s3" {
+    bucket = "myapp-bucket"
+    key = "myapp/state.tfstate"
+    region = "ap-south-1"
+  }
+}
+#! CREATE S3 BUCKET IN AWS WITH NAME
+
 resource "aws_vpc" "myapp-vpc" {
   cidr_block = var.vpc-cidr-block
   tags = {
